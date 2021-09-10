@@ -3,10 +3,12 @@ import './App.css';
 import { GoogleLogin } from 'react-google-login'
 import axios from 'axios'
 import { useEffect, useState } from 'react';
+import Cookies from 'universal-cookie';
 
 
 
 function App() {
+  const cookies = new Cookies();
   const [data, setdata] = useState({})
   const [auth, setauth] = useState(false)
   useEffect(() => {
@@ -14,7 +16,7 @@ function App() {
       method: 'post',
       url: '/auth',
       data: {
-        token: localStorage.getItem('jwt')
+        token: cookies.get('token')
       }
     }).then(res => {
       setdata({name: res.data.name})
@@ -34,7 +36,8 @@ function App() {
       setdata({
         name: res.data.name
       })
-      localStorage.setItem('jwt', res.data.token)
+      cookies.set('token', res.data.token, {HttpOnly: true, expires: 60 * 60 * 60});
+      console.log(cookies.get('token')); // Pacman
       setauth(true)
     })
   }
